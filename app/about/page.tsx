@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 type Props = {};
 
 const About = (props: Props) => {
-  return <div className="h-[100vh]">About</div>;
+  return <div className="">About</div>;
 };
 
 export default About;

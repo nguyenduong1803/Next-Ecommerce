@@ -8,11 +8,11 @@ type Props = {
 
 const MainLayout = (props: Props) => {
   return (
-    <div>
+    <>
       <Header />
-      {props.children}
+      <main className="h-[100vh]"> {props.children}</main>
       <Footer />
-    </div>
+    </>
   );
 };
 

@@ -1,15 +1,13 @@
-import NextAuth, { Awaitable, NextAuthOptions } from "next-auth";
+import NextAuth, {
+  Awaitable,
+  DefaultSession,
+  NextAuthOptions,
+  Session,
+} from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const customLogin = async () => {
-  try {
-    const res = await fetch("http://localhost:3001");
-  } catch (error) {}
-};
-
-const authOption: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     // GoogleProvider({
     //   clientId: process.env.GOOGLE_ID || "",
@@ -33,8 +31,8 @@ const authOption: NextAuthOptions = {
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
         const body = {
-          email: "test1@gmail.com",
-          password: "123456",
+          email: credentials?.email,
+          password: credentials?.password,
         };
         const res = await fetch("http://localhost:5001/api/auth/login", {
           method: "POST",
@@ -42,33 +40,41 @@ const authOption: NextAuthOptions = {
           headers: { "Content-Type": "application/json" },
         });
         const data = await res.json();
-        console.log(data);
+        console.log("data: ", data);
+
         // If no error and we have data data, return it
-        if (data) {
-          return data.user;
+        if (data?.user) {
+          return {
+            ...data.user,
+            token: data.token,
+          };
         }
         // Return null if user data could not be retrieved
-        return {
-          name: "duong",
-          image: "ádfadsf",
-          email: "emmail",
-        };
+        return null;
       },
     }),
   ],
-
+  pages: {
+    signIn: "/signin",
+  },
   callbacks: {
-    signIn({ user }): Awaitable<string | boolean> {
-      console.log("user: ", user);
+    // handle set Token is user info
+    async jwt({ token, user }) {
+      return { ...token, ...user };
+    },
+    signIn(): Awaitable<string | boolean> {
       return true;
     },
-    async jwt({ token }) {
-      console.log("token: ", token);
-      token.userRole = "admin";
-      return token;
+    // handle return user info in session
+    session(props): Awaitable<Session | DefaultSession> {
+      const { session, token: tokens } = props;
+      const { token, ...user } = tokens as any;
+      session.user = user;
+      session.token = token;
+      return { ...session };
     },
   },
 };
-const handler = NextAuth(authOption);
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

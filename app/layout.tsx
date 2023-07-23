@@ -1,3 +1,4 @@
+import ErrorBoundary from "@/components/ErrorBroundary";
 import Provider from "@/components/Provider";
 import MainLayout from "@/components/layouts/mainLayout";
 import "@/styles/globals.css";
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Provider>
-          <MainLayout>{children}</MainLayout>
-        </Provider>
+        <ErrorBoundary>
+          <Provider>
+            <MainLayout>{children}</MainLayout>
+          </Provider>
+        </ErrorBoundary>
       </body>
     </html>
   );
