@@ -122,10 +122,7 @@ abstract class BaseService {
   ): Promise<R> {
     const url = this.getEndpoint(prefix);
     const params = { ...this.searchParams, ...query };
-    const configs = {
-      params,
-      ...config,
-    };
+    const configs = { params, ...config };
     return this.request.get<T, R>(url, configs);
   }
 
